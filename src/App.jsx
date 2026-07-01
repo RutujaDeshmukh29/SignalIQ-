@@ -1,6 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { loadProfile } from './utils/dataStore'
+import Landing      from './pages/Landing'
 import Onboarding   from './pages/Onboarding'
 import Dashboard    from './pages/Dashboard'
 import Trends       from './pages/Trends'
@@ -35,7 +36,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<Landing />} />
+        
         <Route path="/setup" element={<Onboarding />} />
+        
         <Route path="/dashboard" element={
           <RequireProfile><Layout><Dashboard /></Layout></RequireProfile>
         } />
@@ -48,7 +52,8 @@ export default function App() {
         <Route path="/settings" element={
           <RequireProfile><Layout><Settings /></Layout></RequireProfile>
         } />
-        <Route path="*" element={<Navigate to={loadProfile() ? '/dashboard' : '/setup'} replace />} />
+        
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   )

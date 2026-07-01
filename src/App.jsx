@@ -12,7 +12,13 @@ function Layout({ children }) {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <NavBar />
-      <main style={{ flex: 1, padding: '28px 32px', maxWidth: 1200, width: '100%', margin: '0 auto' }}>
+      <main style={{
+        flex: 1,
+        padding: '32px 40px',
+        maxWidth: 1240,
+        width: '100%',
+        margin: '0 auto',
+      }}>
         {children}
       </main>
     </div>

@@ -74,23 +74,67 @@ function getAction(badge) {
   return arr[Math.floor(Math.random() * arr.length)]
 }
 
+// ─── Public refresh ──────────────────────────────────────────────────────────
+export function refreshSignals() {
+  const profile = loadProfile()
+  if (!profile) return
+  // Re-seed signals with fresh random actions and a small score jitter
+  const industry = profile.industry
+  const base = SIGNAL_SEEDS[industry] || SIGNAL_SEEDS['AI/ML Services']
+  const weights = loadWeights()
+  const signals = base.map(s => {
+    const wt = weights[s.keyword] ?? 1.0
+    const jitter = Math.floor(Math.random() * 7) - 3   // ±3 variation
+    const final = Math.min(100, Math.max(10, Math.round(s.recency + s.velocity + s.relevanceBase * wt + jitter)))
+    return { ...s, finalScore: final, action: getAction(s.badge) }
+  })
+  signals.sort((a, b) => b.finalScore - a.finalScore)
+  localStorage.setItem(STORAGE_KEYS.SIGNALS, JSON.stringify(signals))
+  // Refresh digest timestamp so UI shows new generation time
+  const existing = loadDigest()
+  if (existing) {
+    localStorage.setItem(STORAGE_KEYS.DIGEST, JSON.stringify({ ...existing, generatedAt: new Date().toISOString() }))
+  }
+  // Re-seed competitor feed with fresh hours
+  if (profile.competitors?.length) {
+    const feed = generateCompFeed(profile.competitors)
+    localStorage.setItem(STORAGE_KEYS.COMP_FEED, JSON.stringify(feed))
+  }
+}
+
 // ─── Competitor Feeds ─────────────────────────────────────────────────────────
+const COMP_DETAILS = {
+  'AI automation':            (c) => `${c} has quietly integrated an AI-powered workflow layer into its core product, enabling clients to automate repetitive tasks without engineering resources. Early beta users report up to 60% reduction in manual processing time. Industry analysts view this as a direct move to capture the SMB automation budget that has historically gone to specialist tools.`,
+  'new pricing':              (c) => `${c} announced a revised pricing structure that introduces a usage-based tier alongside its existing flat-rate plans. The move appears designed to lower the entry barrier for smaller customers while increasing revenue from high-volume enterprise clients. Competitors with fixed pricing models may face pressure to respond.`,
+  'partnership announcement': (c) => `${c} formalized a strategic partnership that expands its distribution network significantly. The deal grants co-marketing rights and preferred vendor status in a key vertical. Market observers note this reduces ${c}'s dependence on direct sales and accelerates its go-to-market reach by an estimated 40%.`,
+  'product launch':           (c) => `${c} shipped a major product update this week, adding features that directly address the top three pain points cited in user research. The launch was coordinated with a content blitz across LinkedIn and Product Hunt, generating substantial early traction. This positions ${c} more directly against established players in the segment.`,
+  'hiring spree':             (c) => `${c} posted 23 new job openings in the past 30 days, with the majority concentrated in engineering and growth roles. The hiring pattern suggests an upcoming product expansion or a move into an adjacent market. Tracking competitor hiring is one of the clearest leading indicators of strategic direction.`,
+  'blog post published':      (c) => `${c}'s latest long-form content piece attracted significant engagement, with over 4,000 shares across platforms within 48 hours of publication. The piece positions ${c} as a thought leader in the space and appears designed to drive inbound demand for a specific use case. Content-led growth is increasingly central to their acquisition strategy.`,
+  'case study released':      (c) => `${c} published a detailed customer success story featuring measurable ROI metrics from a well-known brand. Case studies of this quality are typically released ahead of sales cycles in a target segment, signalling active pursuit of similar accounts. The metrics cited — including a 3.2× return within 90 days — are compelling proof points.`,
+  'awards recognition':       (c) => `${c} received recognition from a respected industry body, which will likely accelerate enterprise sales conversations where third-party validation matters in procurement processes. Award listings often appear in analyst reports and RFP shortlists, giving ${c} a credibility signal that is difficult to replicate quickly.`,
+}
+
+const SENTIMENTS = ['Threat', 'Neutral', 'Opportunity']
+
 function generateCompFeed(competitors) {
-  const topics = ['AI automation', 'new pricing', 'partnership announcement', 'product launch', 'hiring spree', 'blog post published', 'case study released', 'awards recognition']
+  const topics  = Object.keys(COMP_DETAILS)
   const sources = ['TechCrunch', 'YourStory', 'Inc42', 'Economic Times', 'LinkedIn', 'Product Hunt', 'Twitter/X']
-  const feed = []
+  const feed    = []
   competitors.forEach((comp, ci) => {
     const count = 2 + Math.floor(Math.random() * 3)
     for (let i = 0; i < count; i++) {
       const hoursAgo = (ci * 12) + (i * 18) + Math.floor(Math.random() * 6)
+      const topic    = topics[Math.floor(Math.random() * topics.length)]
       feed.push({
-        id: `cm_${comp}_${i}`,
+        id:             `cm_${comp}_${i}`,
         competitorName: comp,
-        headline: `${comp} — ${topics[Math.floor(Math.random() * topics.length)]}`,
-        source: sources[Math.floor(Math.random() * sources.length)],
+        headline:       `${comp} — ${topic}`,
+        source:         sources[Math.floor(Math.random() * sources.length)],
         hoursAgo,
-        topic: topics[Math.floor(Math.random() * topics.length)],
-        url: '#',
+        topic,
+        detail:         COMP_DETAILS[topic](comp),
+        sentiment:      SENTIMENTS[Math.floor(Math.random() * SENTIMENTS.length)],
+        url:            '#',
       })
     }
   })

@@ -16,7 +16,7 @@ action suggestions — personalized to your industry, business, and feedback ove
 [![License MIT](https://img.shields.io/badge/License-MIT-22C55E?style=flat-square)](LICENSE)
 [![Contest](https://img.shields.io/badge/Raj%20Shamani%20×%20Emergent-Builder's%20Challenge-F97316?style=flat-square)](https://emergent.sh)
 
-[Live Demo](#) 
+[Live Demo](https://signaliq-ai.vercel.app/) 
 </div>
 
 ---
@@ -760,6 +760,7 @@ git push origin feature/your-feature-name
 
 Built by **Rutuja Deshmukh** — AI/ML engineer, freelancer, and diploma(89.59%) from K.K. Wagh Polytechnic, Nashik. Currently pursuing lateral entry into a BE program while building AI-native products.
 
+- 🌐 **Portfolio:** [rutuja-deshmukh-portfolio.vercel.app](https://rutuja-deshmukh-portfolio.vercel.app/)
 - 🔗 **GitHub:** [github.com/RutujaDeshmukh29](https://github.com/RutujaDeshmukh29)
 - 💼 **LinkedIn:** [linkedin.com/in/rutuja-deshmukh29](https://linkedin.com/in/rutuja-deshmukh29)
 - 🧠 **Stack:** LangChain · LangGraph · FastAPI · RAG · ChromaDB · Groq · Next.js

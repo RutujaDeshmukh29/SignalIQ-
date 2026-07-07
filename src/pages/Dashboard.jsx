@@ -71,13 +71,18 @@ export default function Dashboard() {
 
   useEffect(() => { reload() }, [reload, refreshKey])
 
-  function handleRefresh() {
+  useEffect(() => {
+    const lastFetch = localStorage.getItem('siq_last_fetch')
+    if (!lastFetch || Date.now() - parseInt(lastFetch) >= 43200000) {
+      handleRefresh(false)
+    }
+  }, [])
+
+  async function handleRefresh(force = true) {
     setLoading(true)
-    setTimeout(() => {
-      refreshSignals()   // re-seed with fresh scores, actions, timestamps
-      reload()
-      setLoading(false)
-    }, 1400)
+    await refreshSignals(force)
+    reload()
+    setLoading(false)
   }
 
   const hotCount    = signals.filter(s => s.badge === 'hot').length

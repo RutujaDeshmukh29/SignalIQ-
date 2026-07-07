@@ -49,12 +49,13 @@ export default function Onboarding() {
 
   function next() {
     if (step < 4) { setLeaving(true); setTimeout(() => { setStep(s => s + 1); setLeaving(false) }, 220) }
-    else finish()
+    else handleComplete(form.goal)
   }
   function back() { setLeaving(true); setTimeout(() => { setStep(s => s - 1); setLeaving(false) }, 220) }
 
-  function finish() {
-    saveProfile({ ...form, createdAt: new Date().toISOString() })
+  async function handleComplete(goal) {
+    const profile = { ...form, goal, createdAt: Date.now() }
+    await saveProfile(profile)
     navigate('/dashboard')
   }
 

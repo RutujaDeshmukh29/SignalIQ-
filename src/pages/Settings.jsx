@@ -149,8 +149,8 @@ export default function Settings() {
     setForm(f => ({ ...f, [field]: f[field].filter((_, i) => i !== idx) }))
   }
 
-  function handleSave() {
-    saveProfile({ ...form, updatedAt: new Date().toISOString() })
+  async function handleSave() {
+    await saveProfile({ ...form, updatedAt: new Date().toISOString() })
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)
   }
